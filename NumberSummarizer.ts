@@ -1,22 +1,23 @@
 //------------------------
 //-- Defining the event --
 //------------------------
+// Manages EventHandlers of type T
+class EventManager<T extends Function>{
+    private handlers: Array<T>;
 
-interface EvenResultEvent{ (num: number): void; }
-class EvenHandler{
-    private handlers: Array<EvenResultEvent>;
-
-    constructor(){ this.handlers = new Array<EvenResultEvent>(); }
+    constructor(){ this.handlers = new Array<T>(); }
 
     // subscribe function
-    Add = (fnc: EvenResultEvent) => { this.handlers.push(fnc) };
+    Add = (fnc: T) => { this.handlers.push(fnc) };
     // execute functions that had been subscribed
-    Exec = (num: number): void => {
+    Exec = (...args: any[]): void => {
         for (const fnc of this.handlers) {
-            fnc.call(this, num);
+            fnc.call(this, ...args);
         }
     }
 }
+// event type
+type EvenResultEvent = (num: number) => void;
 
 //-----------------------------------
 //-- Use the Event in Custom Class --
@@ -26,12 +27,12 @@ class EvenHandler{
 // in the NumberRows array and call the evenhandlers' functions
 class NumberSummarizer{
     private NumberRows: Array<string>;  // numbers to add
-    public EvenHandlers: EvenHandler;   // event handlers will be placed here
+    public EvenHandlers: EventManager<EvenResultEvent>;   // event handlers will be placed here
 
     constructor(){
         // inits
         this.NumberRows = new Array<string>();
-        this.EvenHandlers = new EvenHandler();
+        this.EvenHandlers = new EventManager();
     }
 
     // checks if the row is valid and adds a summarizable row to the NumberRows array if ok
